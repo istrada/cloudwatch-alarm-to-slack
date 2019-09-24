@@ -1,0 +1,10 @@
+{
+  "name": "cloudwatchalarmtoslack",
+  "description": "An Amazon SNS trigger that sends CloudWatch alarm notifications to Slack",
+  "version": "1.0.0",
+  "private": true,
+  "dependencies": {    
+    "aws-sdk": "^2.535.0",
+    "axios": "^0.19.0"
+  }
+}

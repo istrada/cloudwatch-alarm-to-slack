@@ -1,0 +1,122 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Parameters:  
+  UsernameParameter:
+    Type: String
+    Description: Username of the administrator
+  SlackChannelParameter:
+    Type: String
+  ProductNameParameter:
+    Type: String
+  EnvironmentParameter:
+    Type: String
+    Default: prod
+    AllowedValues:
+      - prod
+      - staging
+    Description: Environment of the application execution
+Description: An Amazon SNS trigger that sends CloudWatch alarm notifications to Slack.
+Resources:
+  CloudWatchAlarmSNSTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      DisplayName: !Sub ${ProductNameParameter}-cloudwatch-alarm
+      TopicName: !Sub ${ProductNameParameter}-cloudwatch-alarm
+  CloudWatchAlarmtoSlackFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Description: An Amazon SNS trigger that sends CloudWatch alarm notifications to Slack.
+      Role: !GetAtt CloudWatchAlarmtoSlackFunctionRole.Arn
+      FunctionName: !Sub cloudwatch-alarm-to-slack-${ProductNameParameter}
+      CodeUri: ./index.js
+      Handler: index.handler
+      Runtime: nodejs8.10
+      Timeout: 5
+      MemorySize: 128
+      Environment:
+        Variables:          
+          slackChannel:  !Sub ${SlackChannelParameter}
+          productName: !Sub ${ProductNameParameter}
+          environmentName: !Sub ${EnvironmentParameter}      
+      Events:
+        CloudWatchAlarmSNS:
+          Type: SNS
+          Properties:
+            Topic:
+              Ref: CloudWatchAlarmSNSTopic
+  CloudWatchAlarmtoSlackFunctionRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      RoleName: !Sub cloudwatch-alarm-to-slack-function-role-${ProductNameParameter}
+      ManagedPolicyArns:
+        - 'arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole'
+        - 'arn:aws:iam::aws:policy/service-role/AWSLambdaSQSQueueExecutionRole'
+      Policies:
+      - PolicyName: giveaccesstossmparameteronly
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Effect: Allow
+            Action:
+            - 'ssm:GetParameter'
+            - 'ssm:GetParametersByPath'
+            Resource: 
+            - !Sub arn:aws:ssm:*:*:parameter/${EnvironmentParameter}/cloudwatchalarmtoslack/*            
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Action:
+              - 'sts:AssumeRole'
+            Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com        
+  ParameterStoreEncryptionKey:
+    Type: AWS::KMS::Key
+    Properties:
+      Description: 'Encryption key saved in the Parameter Store'
+      Enabled: True
+      EnableKeyRotation: False
+      KeyPolicy:
+        Version: '2012-10-17'
+        Id: 'key-default-1'
+        Statement:
+          -
+            Sid: 'Allow administration of the key & encryption of new values'
+            Effect: Allow
+            Principal:
+              AWS:
+                - !Sub 'arn:aws:iam::${AWS::AccountId}:user/${UsernameParameter}'
+            Action:
+              - 'kms:Create*'
+              - 'kms:Encrypt'
+              - 'kms:Describe*'
+              - 'kms:Enable*'
+              - 'kms:List*'
+              - 'kms:Put*'
+              - 'kms:Update*'
+              - 'kms:Revoke*'
+              - 'kms:Disable*'
+              - 'kms:Get*'
+              - 'kms:Delete*'
+              - 'kms:ScheduleKeyDeletion'
+              - 'kms:CancelKeyDeletion'
+            Resource: '*'
+          -
+            Sid: 'Allow use of the key'
+            Effect: Allow
+            Principal:
+              AWS: !GetAtt CloudWatchAlarmtoSlackFunctionRole.Arn
+            Action:
+              - 'kms:Encrypt'
+              - 'kms:Decrypt'
+              - 'kms:ReEncrypt*'
+              - 'kms:GenerateDataKey*'
+              - 'kms:DescribeKey'
+            Resource: '*'
+  ParameterStoreEncryptionKeyAlias:
+    Type: AWS::KMS::Alias
+    Properties:
+      AliasName: alias/cloudwatch-alarm-to-slack-encryptkey
+      TargetKeyId: !GetAtt ParameterStoreEncryptionKey.Arn                           
+
