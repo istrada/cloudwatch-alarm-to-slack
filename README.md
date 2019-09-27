@@ -1,7 +1,9 @@
 # CloudWatch Alarm to Slack Application
 
 An Amazon SNS trigger that sends CloudWatch alarm notifications to Slack.
+
 [aws example](https://github.com/awslabs/serverless-application-model/tree/master/examples/apps/cloudwatch-alarm-to-slack)
+
 [another example](https://github.com/assertible/lambda-cloudwatch-slack)
 
 ## deploy the application
@@ -19,6 +21,13 @@ sam deploy --template-file ./cloudwatchalarmtoslack-deploy-template.yaml --stack
 /prod/cloudwatchalarmtoslack/hookurl
 as secure string encrpted with the key declared in the template
 
+
+If you want to delete the stack
+
+```bash
+aws cloudformation delete-stack --stack-name 'cloudwatchalarmtoslack-istrada'
+aws cloudformation delete-stack --stack-name 'cloudwatchalarmtoslack-concretego'
+```
 
 ## Test
 

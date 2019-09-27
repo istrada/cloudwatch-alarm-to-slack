@@ -8,7 +8,7 @@ var axios = require('axios');
 const querystring = require('querystring');
 
 
-const slackChannel = process.env.slackChannel;
+const slackChannelName = process.env.slackChannel;
 const productName =  process.env.productName;
 const environmentName = process.env.environmentName;
 
@@ -83,6 +83,7 @@ async function processEvent(event) {
   }
 
   var slackMessage = {
+    channel: slackChannelName,
     text: "*" + subject + "*",
     attachments: [
       {
@@ -119,7 +120,7 @@ async function processEvent(event) {
 async function handler(event, context, callback) 
  {
     if (!hookUrl){
-        hookUrl = await getSSMParameter(`/${environmentName}/cloudwatchalarmtoslack/hookurl`);
+        hookUrl = await getSSMParameter(`/${environmentName}/cloudwatchalarmtoslack/${productName}/hookurl`);
     }
 
     if (hookUrl) {

@@ -61,7 +61,7 @@ Resources:
             - 'ssm:GetParameter'
             - 'ssm:GetParametersByPath'
             Resource: 
-            - !Sub arn:aws:ssm:*:*:parameter/${EnvironmentParameter}/cloudwatchalarmtoslack/*            
+            - !Sub arn:aws:ssm:*:*:parameter/${EnvironmentParameter}/cloudwatchalarmtoslack/${ProductNameParameter}/*
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
         Statement:
@@ -117,6 +117,6 @@ Resources:
   ParameterStoreEncryptionKeyAlias:
     Type: AWS::KMS::Alias
     Properties:
-      AliasName: alias/cloudwatch-alarm-to-slack-encryptkey
+      AliasName: !Sub alias/cloudwatch-alarm-to-slack-encryptkey-${ProductNameParameter}
       TargetKeyId: !GetAtt ParameterStoreEncryptionKey.Arn                           
 
