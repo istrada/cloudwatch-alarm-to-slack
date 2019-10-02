@@ -1,0 +1,23 @@
+{
+   "AlarmName":"CloudWatch2SlackTestAlarm",
+   "AlarmDescription":"CloudWatch to Slack Test Alarm",
+   "AWSAccountId":"000000000000",
+   "NewStateValue":"ALARM",
+   "NewStateReason":"Threshold Crossed: 1 datapoint (10.0) was greater than or equal to the threshold (1.0).",
+   "StateChangeTime":"2019-10-02T16:30:42.236+0000",
+   "Region":"US - East-1",
+   "OldStateValue":"OK",
+   "Trigger":{
+      "MetricName":"DeliveryErrors",
+      "Namespace":"ExampleNamespace",
+      "Statistic":"SUM",
+      "Unit":null,
+      "Dimensions":[
+
+      ],
+      "Period":300,
+      "EvaluationPeriods":1,
+      "ComparisonOperator":"GreaterThanOrEqualToThreshold",
+      "Threshold":1.0
+   }
+}
