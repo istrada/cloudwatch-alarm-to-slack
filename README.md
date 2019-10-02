@@ -16,19 +16,21 @@ sam deploy --template-file ./cloudwatchalarmtoslack-deploy-template.yaml --stack
 sam deploy --template-file ./cloudwatchalarmtoslack-deploy-template.yaml --stack-name cloudwatchalarmtoslack-concretego --capabilities CAPABILITY_NAMED_IAM --parameter-overrides SlackChannelParameter=concretego-devops ProductNameParameter=concretego UsernameParameter=liuhongbo EnvironmentParameter=prod
 ```
 
-
-## set the hookurl in the aws system managers parameter store 
-/prod/cloudwatchalarmtoslack/hookurl
-as secure string encrpted with the key declared in the template
-
-
 If you want to delete the stack
-
 ```bash
 aws cloudformation delete-stack --stack-name 'cloudwatchalarmtoslack-istrada'
 aws cloudformation delete-stack --stack-name 'cloudwatchalarmtoslack-concretego'
 ```
 
+## set the hookurl in the aws system managers parameter store 
+for istrada
+go to [parameter store](https://console.aws.amazon.com/systems-manager/parameters) and add a parameter with path set to 
+/prod/cloudwatchalarmtoslack/istrada/hookurl
+as secure string encrpted with the key cloudwatch-alarm-to-slack-encryptkey-istrada
+
 ## Test
 
+[aws sns publish](https://docs.aws.amazon.com/cli/latest/reference/sns/publish.html)
+[What is in the JSON payload Cloudwatch sends to SNS? How can I read that data?](https://stackoverflow.com/questions/52379697/what-is-in-the-json-payload-cloudwatch-sends-to-sns-how-can-i-read-that-data)
 
+aws sns publish --topic arn:aws:sns:us-east-1:746295018053:concretego-cloudwatch-alarm --message file://message.txt
