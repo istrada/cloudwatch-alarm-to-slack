@@ -22,15 +22,20 @@ aws cloudformation delete-stack --stack-name 'cloudwatchalarmtoslack-istrada'
 aws cloudformation delete-stack --stack-name 'cloudwatchalarmtoslack-concretego'
 ```
 
-## set the hookurl in the aws system managers parameter store 
+## Set the hookurl in the aws system managers parameter store 
+
 for istrada
+
 go to [parameter store](https://console.aws.amazon.com/systems-manager/parameters) and add a parameter with path set to 
+
 /prod/cloudwatchalarmtoslack/istrada/hookurl
+
 as secure string encrpted with the key cloudwatch-alarm-to-slack-encryptkey-istrada
 
 ## Test
 
 [aws sns publish](https://docs.aws.amazon.com/cli/latest/reference/sns/publish.html)
+
 [What is in the JSON payload Cloudwatch sends to SNS? How can I read that data?](https://stackoverflow.com/questions/52379697/what-is-in-the-json-payload-cloudwatch-sends-to-sns-how-can-i-read-that-data)
 
 aws sns publish --topic arn:aws:sns:us-east-1:746295018053:concretego-cloudwatch-alarm --message file://message.txt
